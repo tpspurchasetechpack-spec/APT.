@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>APT</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary:     #2563EB;
+  --primary-lt:  #EFF6FF;
+  --primary-md:  #BFDBFE;
+  --primary-dk:  #1D4ED8;
+  --accent:      #0EA5E9;
+  --success:     #10B981;
+  --warn:        #F59E0B;
+  --danger:      #EF4444;
+  --surface:     #FFFFFF;
+  --surface-2:   #F8FAFC;
+  --surface-3:   #F1F5F9;
+  --border:      #E2E8F0;
+  --border-md:   #CBD5E1;
+  --text-1:      #0F172A;
+  --text-2:      #475569;
+  --text-3:      #94A3B8;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.04);
+  --font:        'DM Sans', sans-serif;
+  --mono:        'DM Mono', monospace;
+}
+
+body {
+  background: var(--surface-3);
+  font-family: var(--font);
+  color: var(--text-1);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px 40px;
+}
+
+.app {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--primary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-icon svg { width: 18px; height: 18px; fill: white; }
+
+.brand-text { line-height: 1.2; }
+.brand-name { font-size: 15px; font-weight: 600; color: var(--text-1); letter-spacing: -0.3px; }
+.brand-sub  { font-size: 11px; color: var(--text-3); font-weight: 400; }
+
+.header-actions { display: flex; align-items: center; gap: 8px; }
+
+.pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pill-btn:hover { background: var(--surface-3); border-color: var(--border-md); }
+.pill-btn.active { background: var(--primary-lt); border-color: var(--primary-md); color: var(--primary); }
+
+/* ── GPS CARD ── */
+.gps-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gps-indicator {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.gps-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text-3);
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+.gps-dot.active   { background: var(--success); animation: pulse 2s infinite; }
+.gps-dot.searching{ background: var(--warn); animation: pulse 0.7s infinite; }
+
+.gps-label { font-size: 12px; font-weight: 500; color: var(--text-2); }
+
+.gps-divider { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
+
+.gps-coords {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.gps-field { display: flex; flex-direction: column; gap: 1px; }
+.gps-field-label { font-size: 10px; color: var(--text-3); font-family: var(--mono); letter-spacing: 0.5px; }
+.gps-field-value { font-size: 12px; color: var(--text-1); font-family: var(--mono); font-weight: 500; }
+
+/* ── TIMER CARD ── */
+.timer-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.ring-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  flex-shrink: 0;
+}
+
+.ring-svg {
+  width: 200px;
+  height: 200px;
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--surface-3);
+  stroke-width: 10;
+}
+
+.ring-progress {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 10;
+  stroke-dasharray: 534;
+  stroke-dashoffset: 534;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear, stroke 0.3s;
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.timer-mode-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.timer-display {
+  font-family: var(--mono);
+  font-size: 52px;
+  font-weight: 500;
+  color: var(--text-1);
+  letter-spacing: -1px;
+  line-height: 1;
+  transition: color 0.3s;
+}
+
+.timer-display.warning { color: var(--warn); }
+.timer-display.danger  { color: var(--danger); animation: blink-text 0.5s infinite; }
+.timer-display.done    { color: var(--success); }
+
+.timer-fraction {
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--mono);
+}
+
+/* ── CONTROLS ── */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.ctrl-btn {
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font);
+  font-weight: 500;
+}
+
+.ctrl-btn:active { transform: scale(0.93); }
+
+.btn-main {
+  width: 72px; height: 72px;
+  background: var(--primary);
+  color: white;
+  font-size: 10px;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.35);
+}
+.btn-main:hover { background: var(--primary-dk); box-shadow: 0 6px 20px rgba(37,99,235,0.45); }
+
+.btn-secondary {
+  width: 52px; height: 52px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 10px;
+}
+.btn-secondary:hover { background: var(--surface-3); border-color: var(--border-md); }
+
+.btn-lap {
+  width: 52px; height: 52px;
+  background: #EFF6FF;
+  border: 1px solid var(--primary-md);
+  color: var(--primary);
+  font-size: 10px;
+}
+.btn-lap:hover { background: var(--primary-md); }
+
+.ctrl-icon { font-size: 18px; line-height: 1; }
+.ctrl-label { font-size: 9px; letter-spacing: 0.5px; }
+
+/* ── SECTION ── */
+.section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.section-body { padding: 12px 16px; }
+
+/* ── CUSTOM DURATION ── */
+.duration-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.duration-input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-1);
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  letter-spacing: 1px;
+}
+.duration-input::placeholder { color: var(--text-3); font-size: 12px; font-weight: 400; }
+.duration-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: var(--surface); }
+.duration-input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); animation: shake 0.3s; }
+
+.set-btn {
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.set-btn:hover { background: var(--primary-dk); }
+.set-btn:active { transform: scale(0.97); }
+
+/* ── PRESETS ── */
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.preset-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 10px 4px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.preset-btn:hover { background: var(--primary-lt); border-color: var(--primary-md); }
+.preset-btn.active { background: var(--primary-lt); border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
+.preset-btn:active { transform: scale(0.95); }
+
+.preset-min {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-1);
+  line-height: 1;
+}
+.preset-btn.active .preset-min { color: var(--primary); }
+.preset-unit {
+  font-size: 9px;
+  color: var(--text-3);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.preset-btn.active .preset-unit { color: var(--primary); opacity: 0.7; }
+.preset-secs {
+  font-size: 9px;
+  color: var(--accent);
+  font-family: var(--mono);
+  opacity: 0.8;
+}
+
+/* ── LAP NAME ── */
+.lap-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.lap-name-icon { font-size: 14px; flex-shrink: 0; }
+
+.lap-name-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-1);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+}
+.lap-name-input::placeholder { color: var(--text-3); font-size: 12px; }
+
+.lap-clear-btn {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
+  line-height: 1;
+}
+.lap-clear-btn:hover { color: var(--danger); }
+
+/* ── LAP LIST ── */
+.lap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.no-laps {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: var(--text-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+}
+
+.lap-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 9px 12px;
+  animation: slideIn 0.2s ease;
+}
+
+.lap-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary-lt);
+  border: 1px solid var(--primary-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  flex-shrink: 0;
+  font-family: var(--mono);
+}
+
+.lap-body { flex: 1; min-width: 0; }
+.lap-name-tag { font-size: 11px; font-weight: 600; color: var(--warn); margin-bottom: 1px; }
+.lap-time { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--text-1); }
+.lap-delta { font-size: 11px; color: var(--text-3); font-family: var(--mono); }
+
+.lap-meta { text-align: right; flex-shrink: 0; }
+.lap-stamp { font-size: 10px; color: var(--text-2); font-family: var(--mono); }
+.lap-tod   { font-size: 10px; margin-top: 2px; }
+.lap-gps   { font-size: 9px; color: var(--text-3); font-family: var(--mono); margin-top: 2px; }
+
+/* ── STATUS BAR ── */
+.status-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.stat-item:first-child { align-items: flex-start; }
+.stat-item:last-child  { align-items: flex-end; }
+
+.stat-label { font-size: 9px; color: var(--text-3); font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; }
+.stat-val   { font-size: 14px; font-weight: 600; color: var(--text-1); font-family: var(--mono); }
+.stat-sub   { font-size: 10px; color: var(--text-3); }
+
+/* ── SESSION INFO ── */
+.session-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-lt);
+  border: 1px solid var(--primary-md);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+}
+.session-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; flex-shrink: 0; }
+.session-name { font-size: 13px; font-weight: 600; color: var(--primary); flex: 1; }
+.session-dur  { font-family: var(--mono); font-size: 12px; color: var(--primary); }
+
+/* ── LOGIN OVERLAY ── */
+#loginOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+.login-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 420px;
+  animation: popIn 0.3s ease;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-logo-wrap {
+  width: 56px;
+  height: 56px;
+  background: var(--primary);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+}
+
+.login-logo-wrap svg { width: 28px; height: 28px; fill: white; }
+
+.login-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.3px;
+  margin-bottom: 4px;
+}
+
+.login-subtitle {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.login-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.2px;
+}
+
+.field-input {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-1);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.field-input::placeholder { color: var(--text-3); font-size: 13px; }
+.field-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: var(--surface); }
+.field-input.error { border-color: var(--danger); animation: shake 0.3s; }
+
+.gender-row { display: flex; gap: 8px; }
+
+.gender-btn {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-2);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 11px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.gender-btn:hover { border-color: var(--primary-md); background: var(--primary-lt); color: var(--primary); }
+.gender-btn.selected   { background: var(--primary-lt); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+.gender-btn.selected-f { background: #FDF2F8; border-color: #E879F9; color: #C026D3; font-weight: 600; }
+
+.weather-auto-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+.weather-icon { font-size: 22px; flex-shrink: 0; }
+.weather-info { flex: 1; }
+.weather-temp {
+  font-family: var(--mono); font-size: 18px; font-weight: 500;
+  color: var(--text-1); line-height: 1;
+}
+.weather-cond {
+  font-size: 11px; color: var(--text-3); margin-top: 2px;
+}
+.weather-fetch-btn {
+  background: var(--primary-lt); border: 1px solid var(--primary-md);
+  border-radius: var(--radius-sm); color: var(--primary);
+  font-family: var(--font); font-size: 11px; font-weight: 500;
+  padding: 5px 10px; cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.weather-fetch-btn:hover { background: var(--primary-md); }
+.weather-fetch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.feel-select {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-1);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%2394A3B8'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+}
+.feel-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background-color: var(--surface); }
+.feel-select.error { border-color: var(--danger); animation: shake 0.3s; }
+
+.login-btn {
+  width: 100%;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+}
+.login-btn:hover { background: var(--primary-dk); box-shadow: 0 6px 24px rgba(37,99,235,0.4); transform: translateY(-1px); }
+.login-btn:active { transform: scale(0.98); }
+.login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ── LOGOUT BTN ── */
+.logout-btn {
+  width: 100%;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-2);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.logout-btn:hover { background: #FFF5F5; border-color: #FECACA; color: var(--danger); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 4px; }
+
+/* ── KEYFRAMES ── */
+@keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes shake   { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+@keyframes popIn   { from{transform:scale(0.94);opacity:0} to{transform:scale(1);opacity:1} }
+@keyframes slideIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+@keyframes blink-text { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes ringDone {
+  0%,100%{stroke:#10B981}
+  50%{stroke:#059669}
+}
+
+.ring-progress.done-anim { animation: ringDone 1.4s ease-in-out infinite; }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 0; }
+
+/* ── CLOCK DISPLAY ── */
+.clock-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.clock-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+.clock-time { font-family: var(--mono); font-size: 12px; color: var(--text-2); font-weight: 500; }
+.clock-tod  { font-size: 11px; color: var(--text-3); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo-wrap">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+      </div>
+      <div class="login-title">APT</div>
+      <div class="login-subtitle">Register to start your session</div>
+    </div>
+
+    <div class="login-fields">
+      <div class="field-group">
+        <label class="field-label">Full Name</label>
+        <input class="field-input" id="ln_name" type="text" placeholder="Enter your full name" autocomplete="off" spellcheck="false" maxlength="50"/>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Phone Number</label>
+        <input class="field-input" id="ln_phone" type="tel" placeholder="+91 XXXXX XXXXX" autocomplete="off" maxlength="15"/>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Gender</label>
+        <div class="gender-row">
+          <button class="gender-btn" id="gBtn_M" onclick="selectGender('Male')">♂ Male</button>
+          <button class="gender-btn" id="gBtn_F" onclick="selectGender('Female')">♀ Female</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Temperature &amp; Weather <span style="font-size:10px;color:var(--text-3);font-weight:400;">(auto-detected)</span></label>
+        <div class="weather-auto-row">
+          <div class="weather-icon" id="wx_icon">🌡️</div>
+          <div class="weather-info">
+            <div class="weather-temp" id="wx_temp">-- °C</div>
+            <div class="weather-cond" id="wx_cond">Tap to fetch weather</div>
+          </div>
+          <button class="weather-fetch-btn" id="wx_btn" onclick="fetchWeather()">Fetch</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">How does it feel outside?</label>
+        <select class="feel-select" id="ln_feel">
+          <option value="">— Select condition —</option>
+          <option value="☀️ Sunny">☀️ Sunny</option>
+          <option value="🌤️ Partly Cloudy">🌤️ Partly Cloudy</option>
+          <option value="☁️ Cloudy">☁️ Cloudy</option>
+          <option value="💧 Humid">💧 Humid</option>
+          <option value="🌧️ Rainy">🌧️ Rainy</option>
+          <option value="⛈️ Stormy">⛈️ Stormy</option>
+          <option value="🌫️ Foggy / Misty">🌫️ Foggy / Misty</option>
+          <option value="🌬️ Windy">🌬️ Windy</option>
+          <option value="🥵 Very Hot">🥵 Very Hot</option>
+          <option value="🥶 Very Cold">🥶 Very Cold</option>
+          <option value="😌 Pleasant">😌 Pleasant</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="login-btn" id="loginSubmitBtn" onclick="submitLogin()">
+      Start Session
+    </button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">APT</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="pill-btn on" id="soundToggle" onclick="toggleSound()">
+        <span id="soundIcon">🔊</span>
+        <span id="soundLabel">Sound</span>
+      </button>
+      <div class="pill-btn" id="gpsBadge">
+        <div class="gps-dot searching" id="gpsDot"></div>
+        <span id="gpsStatus">Searching</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION BADGE (hidden until login) -->
+  <div id="sessionBadge" style="display:none;">
+    <div class="section-card">
+      <div class="section-body" style="padding: 12px 16px;">
+        <div class="session-badge">
+          <div class="session-dot"></div>
+          <span class="session-name" id="sessionName">—</span>
+          <span class="session-dur" id="sessionDuration">00:00:00</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- GPS INFO -->
+  <div class="gps-card">
+    <div class="gps-indicator">
+      <div class="gps-dot searching" id="gpsDot2"></div>
+      <span class="gps-label" id="gpsStatusInline">Acquiring GPS…</span>
+    </div>
+    <div class="gps-divider"></div>
+    <div class="gps-coords">
+      <div class="gps-field">
+        <span class="gps-field-label">LAT</span>
+        <span class="gps-field-value" id="gpsLat">---.------</span>
+      </div>
+      <div class="gps-field">
+        <span class="gps-field-label">LNG</span>
+        <span class="gps-field-value" id="gpsLng">---.------</span>
+      </div>
+      <div class="gps-field">
+        <span class="gps-field-label">ACC</span>
+        <span class="gps-field-value" id="gpsAcc">-- m</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMER CARD -->
+  <div class="timer-card">
+    <div class="ring-container">
+      <svg class="ring-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle class="ring-track" cx="100" cy="100" r="85"/>
+        <circle class="ring-progress" id="progressCircle" cx="100" cy="100" r="85"/>
+      </svg>
+      <div class="ring-center">
+        <div class="timer-mode-label" id="selectedLabel">STOPWATCH</div>
+        <div class="timer-display" id="timeDisplay">00:00</div>
+        <div class="timer-fraction" id="fractionDisplay">free run</div>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <button class="ctrl-btn btn-secondary" onclick="resetTimer()" title="Reset">
+        <span class="ctrl-icon">⏹</span>
+        <span class="ctrl-label">Reset</span>
+      </button>
+      <button class="ctrl-btn btn-main" id="startPauseBtn" onclick="toggleStartPause()">
+        <span class="ctrl-icon" id="startIcon">▶</span>
+        <span class="ctrl-label" id="startLabel">START</span>
+      </button>
+      <button class="ctrl-btn btn-lap" onclick="recordLap()" title="Lap">
+        <span class="ctrl-icon">⊙</span>
+        <span class="ctrl-label">Lap</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CUSTOM DURATION -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-title">Custom Duration</span>
+    </div>
+    <div class="section-body">
+      <div class="duration-row">
+        <input class="duration-input" id="customInput" type="text" placeholder="e.g. 2:30 or 90 seconds" maxlength="6" autocomplete="off" spellcheck="false"/>
+        <button class="set-btn" onclick="setCustomDuration()">Set</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRESETS -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-title">Duration Presets</span>
+    </div>
+    <div class="section-body">
+      <div class="preset-grid" id="presetGrid"></div>
+    </div>
+  </div>
+
+  <!-- LAP NAME + LAP LOG -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-title">Lap Log</span>
+      <span style="font-size:12px;color:var(--text-3);" id="lapCount">0 laps</span>
+    </div>
+    <div class="section-body" style="display:flex;flex-direction:column;gap:10px;">
+      <div class="lap-name-row">
+        <span class="lap-name-icon">🏷</span>
+        <input class="lap-name-input" id="lapNameInput" type="text" placeholder="Label this lap (optional)" maxlength="24" autocomplete="off" spellcheck="false"/>
+        <button class="lap-clear-btn" onclick="document.getElementById('lapNameInput').value=''" title="Clear">✕</button>
+      </div>
+      <div class="lap-list" id="lapList">
+        <div class="no-laps">No laps recorded yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div class="stat-item">
+      <span class="stat-label">Elapsed</span>
+      <span class="stat-val" id="elapsedTotal">00:00</span>
+      <div class="clock-row" style="margin-top:2px;">
+        <div class="clock-dot"></div>
+        <span class="clock-time" id="statusDatetime">--</span>
+      </div>
+      <span class="clock-tod" id="elapsedTod" style="margin-top:2px;font-size:10px;"></span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Laps</span>
+      <span class="stat-val" id="lapCountStat">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Best</span>
+      <span class="stat-val" id="bestLap">--:--</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Mode</span>
+      <span class="stat-val" id="modeDisplay" style="font-size:11px;">FREE</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const PRESETS = [
+  { s: 60 }, { s: 120 }, { s: 180 }, { s: 300 },
+  { s: 360 }, { s: 420 }, { s: 480 }, { s: 540 },
+  { s: 600 }, { s: 720 }, { s: 1200 }, { s: 1440 },
+];
+
+const CIRC = 2 * Math.PI * 85;
+
+let selectedDuration = 0;
+let timeLeft = 0;
+let elapsed = 0;
+let totalElapsed = 0;
+let running = false;
+let interval = null;
+let laps = [];
+let lapTimes = [];
+let gpsCoords = null;
+let selectedIdx = -1;
+let soundEnabled = true;
+let beepInterval = null;
+let warningPlayed = false;
+let audioCtx = null;
+
+const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx1QsULBPLrFhCoN5J5C5CxLfUx0a2xb7Xz2UkiRq1h2ch8_Lhv6gZXL-jSyaaMV0ML/exec';
+
+// ── AUDIO ──
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone({ freq = 80, type = 'sine', duration = 0.4, volume = 0.6, attack = 0.01 }) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + attack);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+
+function soundStart()   { playTone({ freq: 440, type: 'sine', duration: 0.3, volume: 0.4 }); setTimeout(() => playTone({ freq: 660, type: 'sine', duration: 0.2, volume: 0.3 }), 80); }
+function soundTick()    { playTone({ freq: 600, type: 'square', duration: 0.06, volume: 0.2 }); }
+function soundWarning() { playTone({ freq: 300, type: 'sawtooth', duration: 0.2, volume: 0.35 }); setTimeout(() => playTone({ freq: 300, type: 'sawtooth', duration: 0.2, volume: 0.35 }), 250); }
+function soundFinish()  { playTone({ freq: 523, type: 'sine', duration: 0.5, volume: 0.6 }); setTimeout(() => playTone({ freq: 659, type: 'sine', duration: 0.4, volume: 0.5 }), 150); setTimeout(() => playTone({ freq: 784, type: 'sine', duration: 0.6, volume: 0.7 }), 300); }
+function soundDoneBeep(){ playTone({ freq: 660, type: 'sine', duration: 0.15, volume: 0.35 }); setTimeout(() => playTone({ freq: 440, type: 'sine', duration: 0.15, volume: 0.3 }), 200); }
+function soundClick()   { playTone({ freq: 300, type: 'sine', duration: 0.1, volume: 0.2 }); }
+function soundLap()     { playTone({ freq: 500, type: 'triangle', duration: 0.15, volume: 0.35 }); setTimeout(() => playTone({ freq: 700, type: 'triangle', duration: 0.1, volume: 0.25 }), 100); }
+
+function startDoneBeeps() { stopDoneBeeps(); soundDoneBeep(); beepInterval = setInterval(soundDoneBeep, 3000); }
+function stopDoneBeeps()  { if (beepInterval) { clearInterval(beepInterval); beepInterval = null; } }
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('soundToggle');
+  const icon = document.getElementById('soundIcon');
+  const label = document.getElementById('soundLabel');
+  if (soundEnabled) {
+    btn.classList.add('active');
+    icon.textContent = '🔊'; label.textContent = 'Sound';
+    soundClick();
+  } else {
+    btn.classList.remove('active');
+    icon.textContent = '🔇'; label.textContent = 'Muted';
+  }
+}
+
+// ── FORMAT ──
+function fmt(sec) {
+  sec = Math.max(0, Math.round(sec));
+  return String(Math.floor(sec / 60)).padStart(2,'0') + ':' + String(sec % 60).padStart(2,'0');
+}
+
+function parseDuration(str) {
+  str = str.trim();
+  if (/^\d+:\d{1,2}$/.test(str)) { const [m,s] = str.split(':').map(Number); return m*60+s; }
+  const n = parseFloat(str);
+  if (!isNaN(n) && n > 0) return n <= 59 ? Math.round(n*60) : Math.round(n);
+  return null;
+}
+
+// ── PRESETS ──
+const grid = document.getElementById('presetGrid');
+PRESETS.forEach((p, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'preset-btn';
+  btn.id = 'preset_' + i;
+  const mins = p.s / 60;
+  btn.innerHTML = `<span class="preset-min">${mins % 1 === 0 ? mins : (p.s+'s')}</span><span class="preset-unit">${mins % 1 === 0 ? 'min' : ''}</span><span class="preset-secs">${p.s}s</span>`;
+  btn.onclick = () => selectPreset(i);
+  grid.appendChild(btn);
+});
+
+function selectPreset(idx) {
+  if (running) return;
+  stopDoneBeeps();
+  if (selectedIdx === idx) {
+    selectedIdx = -1; selectedDuration = 0; timeLeft = 0; elapsed = 0;
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('selectedLabel').textContent = 'STOPWATCH';
+    document.getElementById('progressCircle').classList.remove('done-anim');
+    soundClick(); updateDisplay(); return;
+  }
+  selectedIdx = idx; selectedDuration = PRESETS[idx].s; timeLeft = selectedDuration; elapsed = 0;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('preset_' + idx).classList.add('active');
+  document.getElementById('selectedLabel').textContent = (PRESETS[idx].s/60 % 1 === 0 ? PRESETS[idx].s/60 + ' MIN' : PRESETS[idx].s + 'S') + ' TIMER';
+  document.getElementById('customInput').value = '';
+  document.getElementById('progressCircle').classList.remove('done-anim');
+  soundClick(); updateDisplay();
+}
+
+function setCustomDuration() {
+  if (running) return;
+  stopDoneBeeps();
+  document.getElementById('progressCircle').classList.remove('done-anim');
+  const val = document.getElementById('customInput').value;
+  const secs = parseDuration(val);
+  if (!secs || secs < 5 || secs > 86400) {
+    const inp = document.getElementById('customInput');
+    inp.classList.add('error');
+    setTimeout(() => inp.classList.remove('error'), 1000);
+    return;
+  }
+  selectedDuration = secs; timeLeft = secs; elapsed = 0; selectedIdx = -1;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  const m = Math.floor(secs/60), s = secs%60;
+  document.getElementById('selectedLabel').textContent = `${m}m ${s>0?s+'s ':''} TIMER`;
+  soundClick(); updateDisplay();
+}
+
+document.getElementById('customInput').addEventListener('keydown', e => { if (e.key === 'Enter') setCustomDuration(); });
+
+// ── DISPLAY ──
+function updateDisplay() {
+  const disp = document.getElementById('timeDisplay');
+  disp.textContent = selectedDuration > 0 ? fmt(timeLeft) : fmt(elapsed);
+  disp.className = 'timer-display';
+  const circle = document.getElementById('progressCircle');
+
+  if (selectedDuration > 0 && running) {
+    if (timeLeft <= 10 && timeLeft > 0) { disp.classList.add('danger'); circle.style.stroke = '#EF4444'; }
+    else if (timeLeft <= Math.ceil(selectedDuration * 0.2)) { disp.classList.add('warning'); circle.style.stroke = '#F59E0B'; }
+    else { circle.style.stroke = '#2563EB'; }
+  } else { circle.style.stroke = '#2563EB'; }
+
+  const frac = document.getElementById('fractionDisplay');
+  if (selectedDuration > 0) {
+    frac.textContent = fmt(elapsed) + ' / ' + fmt(selectedDuration);
+    const offset = CIRC * (1 - Math.min(elapsed/selectedDuration, 1));
+    circle.style.strokeDashoffset = offset;
+    circle.style.strokeDasharray = CIRC;
+  } else {
+    frac.textContent = 'free run';
+    circle.style.strokeDashoffset = CIRC;
+    circle.style.strokeDasharray = CIRC;
+  }
+
+  document.getElementById('elapsedTotal').textContent = fmt(totalElapsed);
+  document.getElementById('lapCountStat').textContent = laps.length;
+  document.getElementById('lapCount').textContent = laps.length + ' lap' + (laps.length !== 1 ? 's' : '');
+
+  if (lapTimes.length > 0) {
+    const deltas = lapTimes.map((t,i) => i===0 ? t : t - lapTimes[i-1]);
+    document.getElementById('bestLap').textContent = fmt(Math.min(...deltas));
+  } else {
+    document.getElementById('bestLap').textContent = '--:--';
+  }
+}
+
+// ── TIMER CONTROLS ──
+function toggleStartPause() { if (running) pauseTimer(); else startTimer(); }
+
+function startTimer() {
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  running = true; warningPlayed = false; stopDoneBeeps();
+  document.getElementById('startIcon').textContent = '⏸';
+  document.getElementById('startLabel').textContent = 'PAUSE';
+  document.getElementById('modeDisplay').textContent = selectedDuration > 0 ? 'TIMER' : 'WATCH';
+  document.getElementById('btn-main')?.classList.remove('done-ring');
+  soundStart();
+
+  interval = setInterval(() => {
+    elapsed++; totalElapsed++;
+    if (selectedDuration > 0) {
+      timeLeft = Math.max(0, selectedDuration - elapsed);
+      const warn = Math.ceil(selectedDuration * 0.2);
+      if (timeLeft === warn && !warningPlayed) { soundWarning(); warningPlayed = true; }
+      if (timeLeft <= 10 && timeLeft > 0) soundTick();
+      if (timeLeft === 0) {
+        clearInterval(interval); running = false;
+        document.getElementById('startIcon').textContent = '▶';
+        document.getElementById('startLabel').textContent = 'START';
+        document.getElementById('modeDisplay').textContent = 'DONE ✓';
+        const td = document.getElementById('timeDisplay');
+        td.className = 'timer-display done';
+        document.getElementById('progressCircle').classList.add('done-anim');
+        updateDisplay(); soundFinish(); startDoneBeeps(); return;
+      }
+    }
+    updateDisplay();
+  }, 1000);
+}
+
+function pauseTimer() {
+  running = false; clearInterval(interval);
+  document.getElementById('startIcon').textContent = '▶';
+  document.getElementById('startLabel').textContent = 'RESUME';
+  soundClick();
+}
+
+function resetTimer() {
+  running = false; clearInterval(interval); stopDoneBeeps();
+  elapsed = 0; timeLeft = selectedDuration; warningPlayed = false;
+  document.getElementById('startIcon').textContent = '▶';
+  document.getElementById('startLabel').textContent = 'START';
+  document.getElementById('modeDisplay').textContent = selectedDuration > 0 ? 'TIMER' : 'FREE';
+  document.getElementById('timeDisplay').className = 'timer-display';
+  const circle = document.getElementById('progressCircle');
+  circle.classList.remove('done-anim');
+  circle.style.stroke = '#2563EB';
+  soundClick(); updateDisplay();
+}
+
+// ── LAPS ──
+function recordLap() {
+  if (!running && elapsed === 0) return;
+  const lapAt = elapsed;
+  lapTimes.push(lapAt);
+  const delta = lapTimes.length > 1 ? lapAt - lapTimes[lapTimes.length-2] : lapAt;
+  const tag = gpsCoords ? gpsCoords.lat.toFixed(4) + ', ' + gpsCoords.lng.toFixed(4) : 'no GPS';
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mo = now.toLocaleString('en',{month:'short'}).toUpperCase();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  const stamp = `${dd} ${mo}  ${hh}:${mm}:${ss}`;
+  const tod = getTimeOfDay(now.getHours(), now.getMinutes());
+  const lapName = document.getElementById('lapNameInput').value.trim();
+  laps.unshift({ n: lapTimes.length, t: fmt(lapAt), delta: fmt(delta), tag, stamp, name: lapName, todLabel: tod.label, todColor: tod.color });
+  if (lapName) document.getElementById('lapNameInput').value = '';
+  soundLap(); renderLaps(); updateDisplay();
+}
+
+function renderLaps() {
+  const list = document.getElementById('lapList');
+  if (laps.length === 0) { list.innerHTML = '<div class="no-laps">No laps recorded yet</div>'; return; }
+  list.innerHTML = laps.map(l => `
+    <div class="lap-item">
+      <div class="lap-num">${String(l.n).padStart(2,'0')}</div>
+      <div class="lap-body">
+        ${l.name ? `<div class="lap-name-tag">${l.name}</div>` : ''}
+        <div class="lap-time">${l.t}</div>
+        <div class="lap-delta">+${l.delta}</div>
+      </div>
+      <div class="lap-meta">
+        <div class="lap-stamp">${l.stamp}</div>
+        <div class="lap-tod" style="color:${l.todColor}">${l.todLabel}</div>
+        <div class="lap-gps">${l.tag}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── GPS ──
+function initGPS() {
+  const syncDots = (cls) => {
+    document.getElementById('gpsDot').className = 'gps-dot ' + cls;
+    document.getElementById('gpsDot2').className = 'gps-dot ' + cls;
+  };
+
+  if (!navigator.geolocation) {
+    syncDots(''); document.getElementById('gpsStatus').textContent = 'No GPS';
+    document.getElementById('gpsStatusInline').textContent = 'GPS unavailable';
+    ['gpsLat','gpsLng','gpsAcc'].forEach(id => document.getElementById(id).textContent = 'N/A');
+    return;
+  }
+
+  navigator.geolocation.watchPosition(pos => {
+    gpsCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    syncDots('active');
+    document.getElementById('gpsStatus').textContent = 'Locked';
+    document.getElementById('gpsStatusInline').textContent = 'GPS Locked';
+    document.getElementById('gpsBadge').classList.add('active');
+    document.getElementById('gpsLat').textContent = pos.coords.latitude.toFixed(6);
+    document.getElementById('gpsLng').textContent = pos.coords.longitude.toFixed(6);
+    document.getElementById('gpsAcc').textContent = Math.round(pos.coords.accuracy) + ' m';
+  }, () => {
+    syncDots('');
+    document.getElementById('gpsStatus').textContent = 'Demo';
+    document.getElementById('gpsStatusInline').textContent = 'GPS Demo Mode';
+    document.getElementById('gpsLat').textContent = '17.494700';
+    document.getElementById('gpsLng').textContent = '78.399600';
+    document.getElementById('gpsAcc').textContent = 'demo';
+    gpsCoords = { lat: 17.4947, lng: 78.3996 };
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+// ── CLOCK ──
+function getTimeOfDay(h, m) {
+  const t = h*60+m;
+  // 11:30 PM – 2:30 AM  → Midnight
+  if (t >= 23*60+30 || t < 2*60+30)  return { label: '🌑 Midnight',       color: '#6D28D9' };
+  // 2:30 AM – 6:30 AM   → Early Morning
+  if (t < 6*60+30)                    return { label: '🌌 Early Morning',   color: '#0369A1' };
+  // 6:30 AM – 11:30 AM  → Morning
+  if (t < 11*60+30)                   return { label: '🌅 Morning',         color: '#059669' };
+  // 11:30 AM – 3:30 PM  → Half Noon
+  if (t < 15*60+30)                   return { label: '☀️ Half Noon',      color: '#D97706' };
+  // 3:30 PM – 6:30 PM   → Evening
+  if (t < 18*60+30)                   return { label: '🌇 Evening',         color: '#EA580C' };
+  // 6:30 PM – 7:30 PM   → Late Evening
+  if (t < 19*60+30)                   return { label: '🌆 Late Evening',    color: '#DC2626' };
+  // 7:30 PM – 11:30 PM  → Night
+  return                                      { label: '🌙 Night',           color: '#7C3AED' };
+}
+
+function updateClock() {
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mo = now.toLocaleString('en',{month:'short'}).toUpperCase();
+  const yr = now.getFullYear();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  const el = document.getElementById('statusDatetime');
+  if (el) el.textContent = `${dd} ${mo} ${yr}  ${hh}:${mm}:${ss}`;
+  const tod = getTimeOfDay(now.getHours(), now.getMinutes());
+  const todEl = document.getElementById('elapsedTod');
+  if (todEl) { todEl.textContent = tod.label; todEl.style.color = tod.color; }
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+initGPS();
+updateDisplay();
+
+// ── LOGIN / SESSION ──
+let currentUser = null;
+let selectedGender = '';
+let sessionLoginTime = null;
+let sessionTimerInterval = null;
+let logoutSent = false;
+
+function selectGender(g) {
+  selectedGender = g;
+  document.getElementById('gBtn_M').className = g === 'Male' ? 'gender-btn selected' : 'gender-btn';
+  document.getElementById('gBtn_F').className = g === 'Female' ? 'gender-btn selected-f' : 'gender-btn';
+}
+
+function markError(id) {
+  const el = document.getElementById(id);
+  el.classList.add('error');
+  setTimeout(() => el.classList.remove('error'), 1000);
+}
+
+function startSessionTimer() {
+  if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+  sessionTimerInterval = setInterval(() => {
+    if (!sessionLoginTime) return;
+    const elapsed = Math.floor((Date.now() - sessionLoginTime.getTime()) / 1000);
+    const h = String(Math.floor(elapsed/3600)).padStart(2,'0');
+    const m = String(Math.floor((elapsed%3600)/60)).padStart(2,'0');
+    const s = String(elapsed%60).padStart(2,'0');
+    const el = document.getElementById('sessionDuration');
+    if (el) el.textContent = `${h}:${m}:${s}`;
+  }, 1000);
+}
+
+function getSessionDurationStr() {
+  if (!sessionLoginTime) return '00:00:00';
+  const elapsed = Math.floor((Date.now() - sessionLoginTime.getTime()) / 1000);
+  const h = String(Math.floor(elapsed/3600)).padStart(2,'0');
+  const m = String(Math.floor((elapsed%3600)/60)).padStart(2,'0');
+  const s = String(elapsed%60).padStart(2,'0');
+  return `${h}:${m}:${s}`;
+}
+
+async function submitLogin() {
+  const name  = document.getElementById('ln_name').value.trim();
+  const phone = document.getElementById('ln_phone').value.trim();
+  const feel  = document.getElementById('ln_feel').value;
+
+  if (!name)  { markError('ln_name'); return; }
+  if (!phone || phone.length < 7) { markError('ln_phone'); return; }
+  if (!selectedGender) { alert('Please select a gender.'); return; }
+  if (!feel) {
+    const s = document.getElementById('ln_feel');
+    s.classList.add('error');
+    setTimeout(() => s.classList.remove('error'), 1000);
+    return;
+  }
+
+  sessionLoginTime = new Date();
+  logoutSent = false;
+  currentUser = { name, phone, gender: selectedGender };
+
+  const btn = document.getElementById('loginSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Starting…';
+
+  const loginTimeStr = sessionLoginTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+  const payload = {
+    event: 'login', loginTime: loginTimeStr,
+    name, phone, gender: selectedGender,
+    temp:     document.getElementById('wx_temp').textContent,
+    weather:  document.getElementById('wx_cond').textContent,
+    feel,
+    lat: gpsCoords ? gpsCoords.lat.toFixed(6) : 'N/A',
+    lng: gpsCoords ? gpsCoords.lng.toFixed(6) : 'N/A'
+  };
+
+  if (SHEETS_WEBHOOK_URL && SHEETS_WEBHOOK_URL !== 'https://script.google.com/macros/s/AKfycby5P1nVW5J6gkPW585IcEhgxI95luXJev0OgfhZPZBzBlN8oTFaYJJOUCEVMYyN9iv1/exec') {
+    try {
+      const params = new URLSearchParams(payload);
+      await fetch(SHEETS_WEBHOOK_URL + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+    } catch(err) { console.error('Sheets error:', err); }
+  } else {
+    console.log('📋 User Login:', payload);
+  }
+
+  startSessionTimer();
+
+  document.getElementById('sessionName').textContent = name;
+  document.getElementById('sessionBadge').style.display = 'block';
+
+  const overlay = document.getElementById('loginOverlay');
+  overlay.style.transition = 'opacity 0.4s';
+  overlay.style.opacity = '0';
+  setTimeout(() => { overlay.style.display = 'none'; }, 400);
+
+  btn.disabled = false; btn.textContent = 'Start Session';
+}
+
+async function submitLogout() {
+  if (!currentUser) return;
+  logoutSent = true;
+
+  const logoutTime    = new Date();
+  const logoutTimeStr = logoutTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  const durationStr   = getSessionDurationStr();
+
+  const payload = {
+    event: 'logout', phone: currentUser.phone,
+    logoutTime: logoutTimeStr, sessionDuration: durationStr,
+    lat: gpsCoords ? gpsCoords.lat.toFixed(6) : 'N/A',
+    lng: gpsCoords ? gpsCoords.lng.toFixed(6) : 'N/A'
+  };
+
+  if (SHEETS_WEBHOOK_URL && SHEETS_WEBHOOK_URL !== 'https://script.google.com/macros/s/AKfycbx1QsULBPLrFhCoN5J5C5CxLfUx0a2xb7Xz2UkiRq1h2ch8_Lhv6gZXL-jSyaaMV0ML/exec') {
+    try {
+      const params = new URLSearchParams(payload);
+      await fetch(SHEETS_WEBHOOK_URL + '?' + params.toString(), { method: 'GET', mode: 'no-cors', keepalive: true });
+    } catch(err) { console.error('Logout error:', err); }
+  }
+
+  clearInterval(sessionTimerInterval);
+  sessionLoginTime = null; currentUser = null; selectedGender = '';
+
+  document.getElementById('sessionBadge').style.display = 'none';
+  document.getElementById('sessionDuration').textContent = '00:00:00';
+
+  ['ln_name','ln_phone','ln_height','ln_weight','ln_chest'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('gBtn_M').className = 'gender-btn';
+  document.getElementById('gBtn_F').className = 'gender-btn';
+
+  const overlay = document.getElementById('loginOverlay');
+  overlay.style.opacity = '0'; overlay.style.display = 'flex';
+  setTimeout(() => { overlay.style.transition = 'opacity 0.4s'; overlay.style.opacity = '1'; }, 10);
+}
+
+document.getElementById('ln_feel').addEventListener('keydown', e => { if (e.key === 'Enter') submitLogin(); });
+
+// ── WEATHER AUTO-FETCH ──
+const WX_ICONS = {
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',
+  95:'⛈️',96:'⛈️',99:'⛈️'
+};
+const WX_LABELS = {
+  0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
+  45:'Foggy',48:'Icy fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',
+  61:'Light rain',63:'Moderate rain',65:'Heavy rain',71:'Light snow',
+  73:'Moderate snow',75:'Heavy snow',80:'Rain showers',81:'Heavy showers',
+  82:'Violent showers',95:'Thunderstorm',96:'Thunderstorm + hail',99:'Heavy thunderstorm'
+};
+
+async function fetchWeather() {
+  const btn = document.getElementById('wx_btn');
+  btn.disabled = true; btn.textContent = 'Fetching…';
+
+  try {
+    // Use GPS coords if available, else try IP-based location
+    let lat, lng;
+    if (gpsCoords) {
+      lat = gpsCoords.lat; lng = gpsCoords.lng;
+    } else {
+      const ipRes  = await fetch('https://ipapi.co/json/');
+      const ipData = await ipRes.json();
+      lat = ipData.latitude; lng = ipData.longitude;
+    }
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weathercode,relative_humidity_2m,windspeed_10m&timezone=auto`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    const cur  = data.current;
+
+    const code  = cur.weathercode;
+    const temp  = Math.round(cur.temperature_2m);
+    const humid = cur.relative_humidity_2m;
+    const wind  = Math.round(cur.windspeed_10m);
+    const icon  = WX_ICONS[code] || '🌡️';
+    const label = WX_LABELS[code] || 'Unknown';
+
+    document.getElementById('wx_icon').textContent = icon;
+    document.getElementById('wx_temp').textContent = `${temp} °C`;
+    document.getElementById('wx_cond').textContent = `${label} · ${humid}% humidity · ${wind} km/h wind`;
+
+    btn.textContent = '✓ Done';
+    setTimeout(() => { btn.textContent = 'Refresh'; btn.disabled = false; }, 1500);
+  } catch(err) {
+    document.getElementById('wx_cond').textContent = 'Could not fetch — check connection';
+    btn.textContent = 'Retry'; btn.disabled = false;
+  }
+}
+
+// ── AUTO LOGOUT ──
+function sendLogoutBeacon() {
+  if (!currentUser || !sessionLoginTime || logoutSent) return;
+  logoutSent = true;
+  const logoutTimeStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  const durationStr   = getSessionDurationStr();
+  const params = new URLSearchParams({
+    event: 'logout', phone: currentUser.phone,
+    logoutTime: logoutTimeStr, sessionDuration: durationStr,
+    lat: gpsCoords ? gpsCoords.lat.toFixed(6) : 'N/A',
+    lng: gpsCoords ? gpsCoords.lng.toFixed(6) : 'N/A'
+  });
+  try { fetch(SHEETS_WEBHOOK_URL + '?' + params.toString(), { method: 'GET', mode: 'no-cors', keepalive: true }); } catch(e) {}
+}
+
+document.addEventListener('visibilitychange', () => {
+  // Reset logoutSent if user comes back, so beacon can fire on actual close
+  if (document.visibilityState === 'visible') logoutSent = false;
+});
+window.addEventListener('beforeunload', sendLogoutBeacon);
+</script>
+</body>
+</html>
